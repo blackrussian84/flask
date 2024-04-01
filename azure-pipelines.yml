@@ -1,3 +1,5 @@
+
+pool: ec2
 stages:
 - stage: Build
   jobs:
