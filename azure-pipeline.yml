@@ -1,33 +1,35 @@
 trigger:
-  branches:
-    include:
-      - main
+- main
 
-pool: ec2
+pool:
+  name: ec2
 
 variables:
   dockerImageName: 'blackrussian84/flask'
-  dockerImageTag: ${{ coalesce(variables['Build.SourceBranchName'], 'latest') }}
+  dockerImageTag: 'latest'
 
-stages:
-- stage: Build
-  jobs:
-  - job: Build
-    displayName: 'Build and Test'
-    steps:
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
-        command: 'build'
-        Dockerfile: '**/Dockerfiletest'
-        tags: '$(dockerImageName):$(dockerImageTag)'
+steps:
+- task: Docker@2
+  displayName: 'Build Docker image'
+  inputs:
+    containerRegistry: 'dockerhub'  # Replace with your Docker service connection name
+    repository: '$(dockerImageName)'
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
+    tags: '$(dockerImageTag)'
 
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
-        command: 'push'
-        repository: '$(dockerImageName)'
-        tags: '$(dockerImageTag)'
-      condition: succeeded()
+- task: Docker@2
+  displayName: 'Run pytest in Docker container'
+  inputs:
+    containerRegistry: 'dockerub'  # Replace with your Docker service connection name
+    repository: '$(dockerImageName)'
+    command: 'build'
+    arguments: 'pytest -v test_app.py --junitxml=test-results.xml'
+    tags: '$(dockerImageTag)'
 
-
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '**/test-results.xml'
+  condition: succeededOrFailed()
