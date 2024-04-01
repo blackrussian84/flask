@@ -5,6 +5,10 @@ trigger:
 
 pool: ec2
 
+variables:
+  dockerImageName: 'blackrussian84/flask'
+  dockerImageTag: '$(Build.SourceBranchName)'
+
 stages:
 - stage: Build
   jobs:
@@ -16,14 +20,14 @@ stages:
         containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
         command: 'build'
         Dockerfile: '**/Dockerfiletest'
-        tags: 'counter-service:$(Build.SourceBranchName)'
+        tags: '$(dockerImageName):$(dockerImageTag)'
 
     - task: Docker@2
       inputs:
         containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
         command: 'push'
         repository: 'flask'
-        tags: '$(Build.SourceBranchName)'
+        tags: '$(dockerImageName):$(dockerImageTag)'
       displayName: 'Push Docker Image to Docker Hub'
 
 - stage: Deploy
@@ -39,6 +43,3 @@ stages:
         git merge $(Build.SourceBranchName)
         git push
       displayName: 'Merge changes to main branch'
-      
-
-
