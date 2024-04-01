@@ -26,7 +26,7 @@ stages:
       displayName: 'Build Docker image for testing'
       inputs:
         command: 'build'
-        Dockerfile: '**/Dockerfiletest'
+        Dockerfile: 'Dockerfiletest'
         tags: '$(build.buildId)'
         displayName: 'Run Pytest'
     - task: PublishTestResults@2
@@ -36,6 +36,7 @@ stages:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/test-results.xml'
         failTaskOnFailedTests: true
+        failTaskOnMissingResultsFile: true
 
 
 
@@ -53,7 +54,7 @@ stages:
         containerRegistry: '$(dockerHubConnection)'
         repository: '$(dockerImageNameApp)'
         command: 'build'
-        Dockerfile: '**/Dockerfile'
+        Dockerfile: 'Dockerfile'
         tags: '$(dockerImageTag)'
     - task: Docker@2
       displayName: 'Push Docker image for app'
