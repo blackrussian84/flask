@@ -21,7 +21,7 @@ steps:
 - task: Docker@2
   displayName: 'Run pytest in Docker container'
   inputs:
-    containerRegistry: 'dockerub'  # Replace with your Docker service connection name
+    containerRegistry: 'dockerhub'  # Replace with your Docker service connection name
     repository: '$(dockerImageName)'
     command: 'build'
     arguments: 'pytest -v test_app.py --junitxml=test-results.xml'
