@@ -12,7 +12,14 @@ variables:
   dockerImageNameApp: 'counter'
   dockerImageTag: '${{ coalesce(variables[''$(Build.SourceBranchName)''], ''latest'') }}'
 
+
+
 steps:
+
+- task: CleanupWorkspace@0
+  displayName: 'Cleanup Workspace'
+
+  
 - task: Docker@2
   displayName: Build and Push
   inputs:
@@ -35,3 +42,6 @@ steps:
         docker rm $(dockerHubRepository) || true
         docker run -d --name $(dockerHubRepository) -p 80:80 $(dockerHubRepository):$(dockerImageTag)
       displayName: 'Deploy Docker Container'
+
+- task: CleanupWorkspace@0
+  displayName: 'Cleanup Workspace'
