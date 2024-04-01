@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: 'ec2'
+  name: ec2
 
 variables:
   dockerImageName: flask
