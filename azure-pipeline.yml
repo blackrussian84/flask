@@ -4,7 +4,8 @@ trigger:
       - main
 
 
-pool: aws_ec2
+pool:
+  name: aws_ec2
 
 variables:
   dockerHubRepository: 'blackrussian84/payoneer'
