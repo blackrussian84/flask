@@ -1,0 +1,44 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool: ec2
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    displayName: 'Build and Test'
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub'  # Specify the connection to your Docker Hub registry
+        command: 'build'
+        Dockerfile: '**/Dockerfiletest'
+        tags: 'counter-service:$(Build.SourceBranchName)'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub'  # Specify the connection to your Docker Hub registry
+        command: 'push'
+        repository: 'flask'
+        tags: '$(Build.SourceBranchName)'
+      displayName: 'Push Docker Image to Docker Hub'
+
+- stage: Deploy
+  condition: succeeded()
+  jobs:
+  - job: Deploy
+    displayName: 'Merge to Main'
+    steps:
+    - checkout: self
+    - script: |
+        echo "Merging changes to main branch..."
+        git checkout main
+        git merge $(Build.SourceBranchName)
+        git push
+      displayName: 'Merge changes to main branch'
+      
+
+
