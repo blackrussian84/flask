@@ -13,14 +13,14 @@ stages:
     steps:
     - task: Docker@2
       inputs:
-        containerRegistry: 'dockerhub'  # Specify the connection to your Docker Hub registry
+        containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
         command: 'build'
         Dockerfile: '**/Dockerfiletest'
         tags: 'counter-service:$(Build.SourceBranchName)'
 
     - task: Docker@2
       inputs:
-        containerRegistry: 'dockerhub'  # Specify the connection to your Docker Hub registry
+        containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
         command: 'push'
         repository: 'flask'
         tags: '$(Build.SourceBranchName)'
