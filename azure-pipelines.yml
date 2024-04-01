@@ -1,37 +1,22 @@
+trigger:
+- main
 
-pool: ec2
+pool:
+  name: 'ec2'
+
+variables:
+  dockerImageName: 'webapplication1'
+  dockerImageTag: $(Build.BuildId)
+
 stages:
 - stage: Build
   jobs:
   - job: Build
     displayName: 'Build and Test'
     steps:
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
-        command: 'build'
-        Dockerfile: '**/Dockerfiletest'
-        tags: '$(dockerImageName):$(dockerImageTag)'
-
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'DdockerHub'  # Specify the connection to your Docker Hub registry
-        command: 'push'
-        repository: '$(dockerImageName)'
-        tags: '$(dockerImageTag)'
-      condition: succeeded()
-
-
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-  - job: Deploy
-    displayName: 'Deploy to EC2'
-    steps:
     - script: |
-        docker pull $(dockerImageName):$(dockerImageTag)
-        docker stop $(dockerImageName) || true
-        docker rm $(dockerImageName) || true
-        docker run -d --name $(dockerImageName) -p 80:80 $(dockerImageName):$(dockerImageTag)
-      displayName: 'Deploy Docker Image'      
-      
+        docker build -f ./WebApplication1/Dockerfiletest --target test -t $(dockerImageName):$(dockerImageTag) .
+        docker create -ti --name testcontainer $(dockerImageName):$(dockerImageTag)
+        docker cp testcontainer:/app/test-results.xml $(Build.ArtifactStagingDirectory)/testresults
+        docker rm -fv testcontainer 
+
