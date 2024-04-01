@@ -5,7 +5,7 @@ pool:
   name: 'ec2'
 
 variables:
-  dockerImageName: 'webapplication1'
+  dockerImageName: flask
   dockerImageTag: $(Build.BuildId)
 
 stages:
@@ -15,8 +15,9 @@ stages:
     displayName: 'Build and Test'
     steps:
     - script: |
-        docker build -f ./WebApplication1/Dockerfiletest --target test -t $(dockerImageName):$(dockerImageTag) .
+        docker build -f Dockerfiletest --target test -t $(dockerImageName):$(dockerImageTag) .
         docker create -ti --name testcontainer $(dockerImageName):$(dockerImageTag)
         docker cp testcontainer:/app/test-results.xml $(Build.ArtifactStagingDirectory)/testresults
         docker rm -fv testcontainer 
+        
 
