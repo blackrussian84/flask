@@ -3,6 +3,9 @@ trigger:
     include:
       - main
 
+
+pool: ec2 
+
 variables:
   dockerHubRepository: 'blackrussian84/payoneer'
   dockerHubConnection: 'dockerhub'  # Replace with your Docker Hub service connection name
