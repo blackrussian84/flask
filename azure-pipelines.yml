@@ -1,105 +1,12 @@
-variables:
-  tag: '$(Build.BuildId)'
-
 trigger:
   branches:
     include:
-      - main
-      - dev
+    - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  deploymentGroup:
+    name: aws_ec2
 
-stages:
-- stage: Build
-  jobs:
-  - job: Build
-    displayName: 'Build and Test'
-    steps:
-      - script: echo "Building and testing..."
-      # Add build steps here (e.g., building Docker image, running tests)
-
-- stage: DeployDev
-  displayName: 'Deploy to Development'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
-  jobs:
-  - deployment: DeployDev
-    displayName: 'Deploy to Development'
-    environment: 'Development'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - task: Docker@2
-              displayName: 'Pull Docker image (Development)'
-              inputs:
-                command: 'pull'
-                containerRegistry: 'yourContainerRegistry'  # Update with your container registry
-                repository: 'yourImageName'  # Update with your Docker image name
-                tags: 'latest'  # Update with the tag of the Docker image
-
-            - task: Docker@2
-              displayName: 'Run Docker container (Development)'
-              inputs:
-                command: 'run'
-                containerRegistry: 'yourContainerRegistry'  # Update with your container registry
-                repository: 'yourImageName'  # Update with your Docker image name
-                tags: '$(tag)'  # Use the tag variable
-                action: 'Run an image'
-                ports: '8080:8080'  # Example port mapping
-                containerName: 'yourContainerName'  # Update with your container name
-
-- stage: DeployProd
-  displayName: 'Deploy to Production'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-  jobs:
-  - deployment: DeployProd
-    displayName: 'Deploy to Production'
-    environment: 'Production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - task: Docker@2
-              displayName: 'Pull Docker image (Production)'
-              inputs:
-                command: 'pull'
-                containerRegistry: 'yourContainerRegistry'  # Update with your container registry
-                repository: 'yourImageName'  # Update with your Docker image name
-                tags: 'latest'  # Update with the tag of the Docker image
-
-            - task: Docker@2
-              displayName: 'Run Docker container (Production)'
-              inputs:
-                command: 'run'
-                containerRegistry: 'yourContainerRegistry'  # Update with your container registry
-                repository: 'yourImageName'  # Update with your Docker image name
-                tags: '$(tag)'  # Use the tag variable
-                action: 'Run an image'
-                ports: '8080:8080'  # Example port mapping
-                containerName: 'yourContainerName'  # Update with your container name
-
-- stage: Rollback
-  displayName: 'Rollback on Failure'
-  dependsOn:
-    - DeployDev
-    - DeployProd
-  condition: failed()
-  jobs:
-  - job: Rollback
-    displayName: 'Rollback Deployment'
-    steps:
-      - script: echo "Rolling back deployment due to failure..."
-      # Add rollback steps here (e.g., reverting deployment changes)
-
-- stage: PostAction
-  displayName: 'Post-Action'
-  dependsOn:
-    - Rollback
-  condition: failed()
-  jobs:
-  - job: SendEmail
-    displayName: 'Send Email on Failure'
-    steps:
-      - script: echo "Sending email notification on failure..."
-        # Add script to send email notification on failure
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
