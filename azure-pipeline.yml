@@ -2,8 +2,6 @@ trigger:
   branches:
     include:
       - main
-
-
 pool:
   name: ec2
 
@@ -11,58 +9,18 @@ variables:
   dockerHubRepository: 'blackrussian84/payoneer'
   dockerHubConnection: 'dockerhub'  # Replace with your Docker Hub service connection name
   dockerImageNameTest: 'testcontainer'
-  dockerImageNameApp: 'counter-service'
+  dockerImageNameApp: 'counter'
   dockerImageTag: '${{ coalesce(variables[''$(Build.SourceBranchName)''], ''latest'') }}'
 
-stages:
-- stage: Test
-  displayName: 'Test Docker Image'
-  jobs:
-  - job: Test
-    displayName: 'Test Docker Image with Pytest'
-    continueOnError: false
-    steps:
-    - task: Docker@2
-      displayName: 'Build Docker image for testing'
-      inputs:
-        command: 'build'
-        Dockerfile: 'Dockerfiletest'
-        tags: '$(build.buildId)'
-        displayName: 'Run Pytest'
-    - task: PublishTestResults@2
-      displayName: 'Publish Test Results'
-      condition: always()  # Publish test results regardless of test outcome
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '**/test-results.xml'
-        failTaskOnFailedTests: true
-        failTaskOnMissingResultsFile: true
-
-
-
-- stage: BuildAndPush
-  displayName: 'Build and Push Docker Image'
-  dependsOn: Test
-  condition: succeeded()
-  jobs:
-  - job: BuildAndPush
-    displayName: 'Build and Push Docker Image for App'
-    steps:
-    - task: Docker@2
-      displayName: 'Build Docker image for app'
-      inputs:
-        containerRegistry: '$(dockerHubConnection)'
-        repository: '$(dockerImageNameApp)'
-        command: 'build'
-        Dockerfile: 'Dockerfile'
-        tags: '$(dockerImageTag)'
-    - task: Docker@2
-      displayName: 'Push Docker image for app'
-      inputs:
-        containerRegistry: '$(dockerHubConnection)'
-        repository: '$(dockerImageNameApp)'
-        command: 'push'
-        tags: '$(dockerImageTag)'
+steps:
+- task: Docker@2
+  displayName: Build and Push
+  inputs:
+    command: buildAndPush
+    containerRegistry: $(dockerHubConnection)
+    repository: $(dockerHubRepository)
+    tags: |
+      $(dockerHubRepository):$(dockerImageTag)
 
 - stage: Deploy
   displayName: 'Deploy Container'
@@ -72,8 +30,8 @@ stages:
     displayName: 'Deploy to Environment'
     steps:
     - script: |
-        docker pull $(dockerImageNameApp):$(dockerImageTag)
-        docker stop $(dockerImageNameApp) || true
-        docker rm $(dockerImageNameApp) || true
-        docker run -d --name $(dockerImageNameApp) -p 80:80 $(dockerImageNameApp):$(dockerImageTag)
+        docker pull $(dockerHubRepository):$(dockerImageTag)
+        docker stop $(dockerHubRepository) || true
+        docker rm $(dockerHubRepository) || true
+        docker run -d --name $(dockerHubRepository) -p 80:80 $(dockerHubRepository):$(dockerImageTag)
       displayName: 'Deploy Docker Container'
