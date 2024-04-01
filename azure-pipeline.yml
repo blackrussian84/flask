@@ -5,7 +5,7 @@ trigger:
 
 
 pool:
-  name: Payoneer-aws_ec2
+  name: ec2
 
 variables:
   dockerHubRepository: 'blackrussian84/payoneer'
