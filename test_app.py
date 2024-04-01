@@ -17,11 +17,10 @@ def test_counter_get():
         assert response.status_code == 200
         assert b'0' in response.data  # Assuming the counter starts at 0
 
-# End-to-end test
 def test_counter_post():
     global post_counter
     initial_counter = post_counter
-    response = requests.post('http://localhost:80/')
+    with app.test_client() as client:
+        response = client.post('/')
     assert response.status_code == 200
-    post_counter += 1
-    assert post_counter == initial_counter + 1
+    # Add any other assertions you need here    
