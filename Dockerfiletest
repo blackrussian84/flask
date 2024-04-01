@@ -13,9 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Use a separate stage for testing
 FROM base as test
 RUN pip install pytest
-CMD ["pytest", "test_app.py", "--junitxml=test-results.xml"]
+CMD ["pytest", "-v", "test_app.py", "--junitxml=test-results.xml"]
 
 # Use a separate stage for production
 FROM base as prod
 CMD ["python", "app.py"]
-
