@@ -25,6 +25,15 @@ stages:
         Dockerfile: '**/Dockerfiletest'
         tags: '$(build.buildId)'
         displayName: 'Run Pytest'
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      condition: always()  # Publish test results regardless of test outcome
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/test-results.xml'
+        failTaskOnFailedTests: true
+
+
 
 - stage: BuildAndPush
   displayName: 'Build and Push Docker Image'
