@@ -97,6 +97,13 @@ stages:
         targetType: 'inline'
         script: 'docker pull blackrussian84/payoneer:$(Build.SourceBranchName)'
     - task: Bash@3
+      displayName: 'Stop and Remove Existing Docker Container'
+      inputs:
+        targetType: 'inline'
+        script: |
+          docker stop $(docker ps -q --filter ancestor=blackrussian84/payoneer) || true
+          docker rm $(docker ps -a -q --filter ancestor=blackrussian84/payoneer) || true
+    - task: Bash@3
       displayName: 'Run Docker Image'
       inputs:
         targetType: 'inline'
