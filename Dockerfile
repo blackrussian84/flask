@@ -17,3 +17,4 @@ EXPOSE 80
 
 # Set the command to run when the container starts
 CMD ["gunicorn", "-b", "0.0.0.0:80", "app:app"]
+
