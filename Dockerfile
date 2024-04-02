@@ -14,6 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose port 80 for the Flask application
 EXPOSE 80
 
-# Set the command to run when the container starts
+# Set the command to run when the container starts Production ready
 CMD ["gunicorn", "-b", "0.0.0.0:80", "app:app"]
 
