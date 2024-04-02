@@ -1,6 +1,10 @@
-# Docker
 trigger:
-- main
+  branches:
+    include:
+      - main
+
+    manual:
+      true  
 
 variables:
   # Container registry service connection established during pipeline creation
@@ -88,6 +92,6 @@ stages:
         containerregistrytype: 'Container Registry'
         dockerRegistryConnection: dockerhub
         action: 'Run a Docker command'
-        customCommand: 'pull blackrussian84/payoneer:main && docker run blackrussian84/payoneer:$(Build.SourceBranchNametag'
+        customCommand: 'pull blackrussian84/payoneer:main && docker run blackrussian84/payoneer:$(Build.SourceBranchNametag)'
         ports: 80
       condition: succeededOrFailed()
