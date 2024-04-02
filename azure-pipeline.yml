@@ -3,8 +3,13 @@ trigger:
     include:
       - main
 
-    manual:
-      true  
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: main
+
+
 
 variables:
   # Container registry service connection established during pipeline creation
@@ -86,12 +91,13 @@ stages:
   - job: DeployJob
     displayName: 'Deploy Job'
     steps:
-    - task: Docker@0
-      displayName: 'Deploy'
+    - task: Bash@3
+      displayName: 'Pull Docker Image'
       inputs:
-        containerregistrytype: 'Container Registry'
-        dockerRegistryConnection: dockerhub
-        action: 'Run a Docker command'
-        customCommand: 'pull blackrussian84/payoneer:main && docker run blackrussian84/payoneer:$(Build.SourceBranchNametag)'
-        ports: 80
-      condition: succeededOrFailed()
+        targetType: 'inline'
+        script: 'docker pull blackrussian84/payoneer:$(Build.SourceBranchName)'
+    - task: Bash@3
+      displayName: 'Run Docker Image'
+      inputs:
+        targetType: 'inline'
+        script: 'docker run -d -p 80:80 blackrussian84/payoneer:$(Build.SourceBranchName)'
