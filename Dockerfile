@@ -1,4 +1,3 @@
-# Dockerfile for building a Flask application container
 
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim-buster 
